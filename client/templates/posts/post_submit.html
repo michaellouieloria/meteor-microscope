@@ -11,7 +11,28 @@
       <div class="controls">
         <input name="title" id="title" type="text" value="" placeholder="Name your post" class="form-control"/>
       </div>
+      <div class="controls">
+        <br/>
+        {{> upload_bootstrap contentType='images' fileTypes='.jpg' }}
+        <p class="well">
+          {{> uploadInfo}}
+        </p>
+      </div>
     </div>
     <input type="submit" value="Submit" class="btn btn-primary"/>
   </form>
+</template>
+
+<template name="uploadInfo">
+    <b>Upload Info</b><br>
+    {{#each files}}
+      <input type="hidden" name="image" id="image" value="{{ name }}">
+        <ul>
+            <li>Name: {{ name }}</li>
+            <li>Size: {{ size }} B</li>
+            <li>Type: {{ type }}</li>
+            <li>Last Modified: {{ lastModified }}</li>
+            <li>Last Modified Date: {{ lastModifiedDate }}</li>
+        </ul>
+    {{/each}}
 </template>
