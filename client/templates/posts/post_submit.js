@@ -1,18 +1,19 @@
 Template.postSubmit.events({
   'submit form': function(e, template) {
     e.preventDefault();
+
+    var input = template.find('input[type=file]');
+    var files = input.files;
+    var trimmed = files[0].name.trim();
+    filename = Random.id() + '-' + trimmed.replace(/[^a-z0-9-.]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
     var post = {
       url: $(e.target).find('[name=url]').val(),
       title: $(e.target).find('[name=title]').val(),
-      image: 'sdsdsd'
+      image: filename
     };
 
-
-      var input = template.find('input[type=file]');
-      var files = input.files;
-
-console.log(files[0]);
-Meteor.saveFile(files[0], 'lorz.jpg', '', 'binary');
+    Meteor.saveFile(files[0], filename, '/.uploads/images/original/', '/.uploads/images/thumb/', 'binary');
     // _.each(e.srcElement.files, function(file) {
     //   console.log(file.name);
     //   Meteor.saveFile(file, file.name);
@@ -40,7 +41,7 @@ Template.uploadInfo.helpers({
   }
 });
 
-Meteor.saveFile = function(blob, name, path, type) {
+Meteor.saveFile = function(blob, name, original, thumb, type) {
   var fileReader = new FileReader(),
     method, encoding = 'binary', type = type || 'binary';
   switch (type) {
@@ -59,7 +60,7 @@ Meteor.saveFile = function(blob, name, path, type) {
       break;
   }
   fileReader.onload = function(file) {
-    Meteor.call('saveFile', file.srcElement.result, name, path, encoding, function(error, result) {});
+    Meteor.call('saveFile', file.srcElement.result, name, original, thumb, encoding, function(error, result) {});
   }
   fileReader[method](blob);
 }

@@ -1,4 +1,9 @@
 {
   "PORT": 3000,
-  "ROOT_URL": "http://localhost"
+  "ROOT_URL": "http://localhost",
+  "public": {
+    "disqus": {
+      "shortname": "0gag"
+    }
+  }
 }

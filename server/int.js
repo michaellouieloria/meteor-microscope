@@ -21,29 +21,37 @@ Meteor.startup(function () {
 });
 
 Meteor.methods({
-  saveFile: function(blob, name, path, encoding) {
-    console.log('sdsd');
+  saveFile: function(blob, name, original, thumb, encoding) {
     check(blob, Match.Any);
     check(name, String);
-    check(path, String);
+    check(original, String);
+    check(thumb, String);
     check(encoding, String);
 
-    var path = cleanPath(path),
-      name = cleanName(name || 'file'), encoding = encoding || 'binary',
+    var name = cleanName(name || 'file'), encoding = encoding || 'binary',
       chroot = Meteor.chroot || (process.env.PWD + '/.uploads/images');
-    // Clean up the path. Remove any initial and final '/' -we prefix them-,
+    // Clean up the original. Remove any initial and final '/' -we prefix them-,
     // any sort of attempt to go to the parent directory '..' and any empty directories in
     // between '/////' - which may happen after removing '..'
-    path = chroot + (path ? '/' + path + '/' : '/');
+    original = process.env.PWD + original
+    thumb = process.env.PWD + thumb
 
     // TODO Add file existance checks, etc...
-    fs.writeFile(path + name, blob, encoding, function(err) {
+    fs.writeFile(original + name, blob, encoding, function(err) {
       if (err) {
         throw (new Meteor.Error(500, 'Failed to save file.', err));
       } else {
-        console.log('The file ' + name + ' (' + encoding + ') was saved to ' + path);
+        console.log('The file ' + name + ' (' + encoding + ') was saved to ' + original);
       }
     });
+
+    Imagemagick.resize({
+      srcPath: original + name,
+      dstPath: thumb + name,
+      width: 100
+    });
+
+    //Imagemagick.convert([path + name, '-resize', '25x120', path + 'test.jpg']);
 
     function cleanPath(str) {
       if (str) {
@@ -56,3 +64,8 @@ Meteor.methods({
     }
   }
 });
+
+BrowserPolicy.content.allowInlineScripts();
+BrowserPolicy.content.allowOriginForAll('*.disquscdn.com');
+BrowserPolicy.content.allowOriginForAll('*.disqus.com');
+BrowserPolicy.content.allowOriginForAll('*.google-analytics.com');
